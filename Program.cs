@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FYH.Quiz
 {
@@ -23,7 +24,7 @@ namespace FYH.Quiz
                             var width = int.Parse(val.Split(" ")[0]);
                             var height = int.Parse(val.Split(" ")[1]);
                             canvas = new Canvas(width, height);
-                            Print(canvas.Pixels);
+                            Console.Write(canvas.Output);
                             
                             break;
 
@@ -40,7 +41,7 @@ namespace FYH.Quiz
                             else
                             {
                                 canvas.DrawLine(x1, y1, x2, y2);
-                                Print(canvas.Pixels);
+                                Console.Write(canvas.Output);
                             }
                             
                             break;
@@ -58,7 +59,7 @@ namespace FYH.Quiz
                             else
                             {
                                 canvas.DrawRectangle(xx1, yy1, xx2, yy2);
-                                Print(canvas.Pixels);
+                                Console.Write(canvas.Output);
                             }
                             
                             break;
@@ -75,7 +76,7 @@ namespace FYH.Quiz
                             else
                             {
                                 canvas.Fill(x, y, colour[0]);
-                                Print(canvas.Pixels);
+                                Console.Write(canvas.Output);
                             }
                             
                             break;
@@ -91,7 +92,15 @@ namespace FYH.Quiz
                 }
                 catch(IndexOutOfRangeException)
                 {
-                    Console.WriteLine("parameters are not correct." + instructionStr);                    
+                    Console.WriteLine("parameters are not correct." + instructionStr);
+                }
+                catch(FormatException)
+                {
+                    Console.WriteLine("parameters are not correct." + instructionStr);
+                }
+                catch(KeyNotFoundException)
+                {
+                    Console.WriteLine("input exceeds range.");
                 }
                 catch(Exception exception)
                 {

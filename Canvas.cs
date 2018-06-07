@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace FYH.Quiz
 {
@@ -6,7 +8,9 @@ namespace FYH.Quiz
     {
         private int _width;
         private int _height;
-        public char[][] Pixels;
+        // public char[][] Pixels;
+
+        private SortedDictionary<int, SortedDictionary<int, char>> Pixels;
 
         public Canvas(int width, int height)
         {
@@ -18,29 +22,30 @@ namespace FYH.Quiz
             _width = width;
             _height = height;
 
-            if (_width > 0 && _height > 0) 
-            {
-                Pixels = new char[_height + 2][];
-                for (var i = 0; i < _height + 2; i++) 
-                {
-                    Pixels[i] = new char[_width + 2];
-                    for (var j = 0; j < _width + 2; j++) 
-                    {
-                        if (i == 0 || i == _height + 1) 
-                        {
-                            Pixels[i][j] = '-';
-                        } 
-                        else if (j == 0 || j == _width + 1) 
-                        {
-                            Pixels[i][j] = '|';
-                        } 
-                        else 
-                        {
-                            Pixels[i][j] = ' ';
-                        }
-                    }
-                }
-            }
+            Pixels = new SortedDictionary<int, SortedDictionary<int, char>>();
+            // if (_width > 0 && _height > 0) 
+            // {
+            //     Pixels = new char[_height + 2][];
+            //     for (var i = 0; i < _height + 2; i++) 
+            //     {
+            //         Pixels[i] = new char[_width + 2];
+            //         for (var j = 0; j < _width + 2; j++) 
+            //         {
+            //             if (i == 0 || i == _height + 1) 
+            //             {
+            //                 Pixels[i][j] = '-';
+            //             } 
+            //             else if (j == 0 || j == _width + 1) 
+            //             {
+            //                 Pixels[i][j] = '|';
+            //             } 
+            //             else 
+            //             {
+            //                 Pixels[i][j] = ' ';
+            //             }
+            //         }
+            //     }
+            // }
         }
 
         public bool CanDraw 
@@ -48,6 +53,45 @@ namespace FYH.Quiz
             get
             {
                 return _width > 0 && _height > 0;
+            }
+        }
+
+        public string Output
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                if (CanDraw)
+                {
+                    for (var i = 0; i < _height + 2; i++) 
+                    {
+                        for (var j = 0; j < _width + 2; j++) 
+                        {
+                            if (i == 0 || i == _height + 1) 
+                            {
+                                sb.Append('-');
+                            } 
+                            else if (j == 0 || j == _width + 1) 
+                            {
+                                sb.Append('|');
+                            }
+                            else 
+                            {
+                                if(Pixels.ContainsKey(i) && Pixels[i].ContainsKey(j))
+                                {
+                                    sb.Append(Pixels[i][j]);
+                                }
+                                else
+                                {
+                                    sb.Append(' ');
+                                }
+                            }
+                        }
+                        sb.AppendLine();
+                    }
+                }
+
+                return sb.ToString();
             }
         }
 
@@ -71,7 +115,17 @@ namespace FYH.Quiz
                 }
                 for (var i = min; i <= max; i++) 
                 {
-                    Pixels[i][x1] = 'x';
+                    if (Pixels.ContainsKey(i))
+                    {
+                        if (!Pixels[i].ContainsKey(x1))
+                        {
+                            Pixels[i].Add(x1, 'x');
+                        }
+                    }
+                    else
+                    {
+                        Pixels.Add(i, new SortedDictionary<int, char>() { { x1, 'x' } });
+                    }
                 }
             } 
             else if (y1 == y2) 
@@ -84,7 +138,17 @@ namespace FYH.Quiz
                 }
                 for (var i = min; i <= max; i++) 
                 {
-                    Pixels[y1][i] = 'x';
+                    if (Pixels.ContainsKey(y1))
+                    {
+                        if (!Pixels[y1].ContainsKey(i))
+                        {
+                            Pixels[y1].Add(i, 'x');
+                        }
+                    }
+                    else
+                    {
+                        Pixels.Add(y1, new SortedDictionary<int, char>() { {i, 'x'} });
+                    }
                 }
             }
             else
@@ -105,9 +169,21 @@ namespace FYH.Quiz
             if (x <= 0 || x >= _width + 1 || y <= 0 || y >= _height + 1) {
                 return;
             }
-            if (Pixels[y][x] != ' ')
+            if (Pixels.ContainsKey(y) && Pixels[y].ContainsKey(x))
                 return;
-            Pixels[y][x] = colour;
+
+            if (Pixels.ContainsKey(y))
+            {
+                if (!Pixels[y].ContainsKey(x))
+                {
+                    Pixels[y].Add(x, colour);
+                }
+            }
+            else
+            {
+                Pixels.Add(y, new SortedDictionary<int, char>() { {x, colour} });
+            }
+
             Fill(x - 1, y, colour);
             Fill(x, y - 1, colour);
             Fill(x + 1, y, colour);
